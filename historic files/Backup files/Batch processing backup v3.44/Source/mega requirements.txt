@@ -1,0 +1,13 @@
+tech_starbase_2.dds
+tech_starbase_3.dds
+tech_starbase_4.dds
+tech_starbase_5.dds
+tech_fission_power.dds
+tech_fusion_power.dds
+tech_cold_fusion_power.dds
+tech_antimatter_power.dds
+tech_zero_point_power.dds
+tech_corvettes.dds
+tech_destroyers.dds
+tech_cruisers.dds
+tech_battleships.dds

@@ -1,0 +1,9 @@
+Make the desired changes to the images, add new ones or move them around in the folder structures
+
+Run python file to generate batch file
+Run batch file to execute cmd commands that merge the templates with the selected images based on folder structure
+If show_mega_req is set to True in .py file then the batch file will have additional lines to add a letter M to required technologies of mega engineering based on a .txt file in Source folder
+
+All of the images get outputed into a folder together ready to be pasted into an updated version's technology subfolder
+
+You can see the progress of the images in Source by the changing current_template.dds image
