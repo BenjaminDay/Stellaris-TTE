@@ -214,7 +214,7 @@ def make_batch_file(structure, source_icons, mega_list, ecu_list, temp_icons=r'.
     for tech in mega_list:
         composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\mega_engineering.dds", f'{destination_folder}\\{tech}.dds')
     for tech in ecu_list:
-        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\ecumonopolis.dds", f'{destination_folder}\\{tech}.dds')
+        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\ecumenopolis.dds", f'{destination_folder}\\{tech}.dds')
 
     #Cleanup
     batch_file.write('rd /s /q "icons"\n')
