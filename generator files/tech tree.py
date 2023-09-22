@@ -176,7 +176,7 @@ def composite(file, layer1, layer2, path):
     #run cmd line to composite layer2 onto layer1 and save result as os.path.join(sub_path.replace("Source", "Output"), img)
 
 
-def make_batch_file(structure, source_icons, mega_list, temp_icons=r'.\icons'):
+def make_batch_file(structure, source_icons, mega_list, ecu_list, temp_icons=r'.\icons'):
     #Create the file
     batch_file = open("run_composition.bat", "w")
     destination_folder = r'.\TTE Mod\gfx\interface\icons\technologies'
@@ -210,8 +210,11 @@ def make_batch_file(structure, source_icons, mega_list, temp_icons=r'.\icons'):
                 composite(batch_file, ".\\Templates\\current_template.dds", f'{temp_icons}\\{tech}', f'{destination_folder}\\{tech}') 
             uc += 1
         tc += 1
+
     for tech in mega_list:
-        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\mega_engineering.dds", f'{destination_folder}\\{tech}.dds') 
+        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\mega_engineering.dds", f'{destination_folder}\\{tech}.dds')
+    for tech in ecu_list:
+        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\ecumonopolis.dds", f'{destination_folder}\\{tech}.dds')
 
     #Cleanup
     batch_file.write('rd /s /q "icons"\n')
@@ -252,7 +255,9 @@ def get_prerequisites(tree, tech_name):
     return list(set(get_raw_prerequisites(tree, tech_name)))
     
 
-def get_raw_prerequisites(tree, tech_name, requirements_list=[]):
+def get_raw_prerequisites(tree, tech_name, requirements_list=None):
+    if requirements_list is None:
+        requirements_list = []
     for i in range(len(tree)):
         if tree[i]['name'] == tech_name:
             leaf = tree[i]['prerequisites']
@@ -261,7 +266,7 @@ def get_raw_prerequisites(tree, tech_name, requirements_list=[]):
 
             if leaf != []:
                 for prereq_name in leaf:
-                    requirements_list = get_raw_prerequisites(tree, prereq_name)
+                    requirements_list = get_raw_prerequisites(tree, prereq_name, requirements_list)
 
             return requirements_list
 
@@ -287,10 +292,12 @@ def main(tech_info_path, tech_icon_path):
 
 
     mega_list = get_prerequisites(tree, "tech_mega_engineering")
+    ecu_list = get_prerequisites(tree, "tech_housing_2") + ["tech_housing_2"]
     if logging:
-        print(mega_list)
+        print("Mega list", mega_list)
+        print("Ecu list", ecu_list)
 
-    make_batch_file(structure, tech_icon_path, mega_list)
+    make_batch_file(structure, tech_icon_path, mega_list, ecu_list)
 
 
 if __name__ == '__main__':
