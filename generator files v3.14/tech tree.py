@@ -130,6 +130,10 @@ def dict_creator(raw_data, dumb_techs):
     tree = []
     tech_dict = {}
     for line in raw_data:
+        if line_logging:
+            print(line)
+        if '    ' in line[:4]:
+            line = line[4:]
         if '#' in line[:2]:
             line = line.split('#')[1]
         if '\t' in line[:2]:
@@ -153,7 +157,7 @@ def dict_creator(raw_data, dumb_techs):
                     tech_dict['prerequisites'] += [string]
         else:
             tree.append(tech_dict) # Append previous tech
-            print("This tech is dumb: ", line.split(' = {')[0])
+            #print("This tech is dumb: ", line.split(' = {')[0])
             for dumb_tech in dumb_techs:
                 if dumb_tech in line:
                     tech_dict = {'name': line.split(' = {')[0], 'tier': '', 'prerequisites': [], 'unlocks' : []}
@@ -176,7 +180,7 @@ def composite(file, layer1, layer2, path):
     #run cmd line to composite layer2 onto layer1 and save result as os.path.join(sub_path.replace("Source", "Output"), img)
 
 
-def make_batch_file(structure, source_icons, mega_list, ecu_list, temp_icons=r'.\icons'):
+def make_batch_file(structure, source_icons, mega_list, temp_icons=r'.\icons'):
     #Create the file
     batch_file = open("run_composition.bat", "w")
     destination_folder = r'.\TTE Mod\gfx\interface\icons\technologies'
@@ -210,11 +214,8 @@ def make_batch_file(structure, source_icons, mega_list, ecu_list, temp_icons=r'.
                 composite(batch_file, ".\\Templates\\current_template.dds", f'{temp_icons}\\{tech}', f'{destination_folder}\\{tech}') 
             uc += 1
         tc += 1
-
     for tech in mega_list:
-        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\mega_engineering.dds", f'{destination_folder}\\{tech}.dds')
-    for tech in ecu_list:
-        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\ecumenopolis.dds", f'{destination_folder}\\{tech}.dds')
+        composite(batch_file, f'{destination_folder}\\{tech}.dds', ".\\Templates\\mega_engineering.dds", f'{destination_folder}\\{tech}.dds') 
 
     #Cleanup
     batch_file.write('rd /s /q "icons"\n')
@@ -255,9 +256,7 @@ def get_prerequisites(tree, tech_name):
     return list(set(get_raw_prerequisites(tree, tech_name)))
     
 
-def get_raw_prerequisites(tree, tech_name, requirements_list=None):
-    if requirements_list is None:
-        requirements_list = []
+def get_raw_prerequisites(tree, tech_name, requirements_list=[]):
     for i in range(len(tree)):
         if tree[i]['name'] == tech_name:
             leaf = tree[i]['prerequisites']
@@ -266,13 +265,13 @@ def get_raw_prerequisites(tree, tech_name, requirements_list=None):
 
             if leaf != []:
                 for prereq_name in leaf:
-                    requirements_list = get_raw_prerequisites(tree, prereq_name, requirements_list)
+                    requirements_list = get_raw_prerequisites(tree, prereq_name)
 
             return requirements_list
 
 
 def main(tech_info_path, tech_icon_path):
-    dumb_techs = ["null_void_beam"]
+    dumb_techs = ["N/A"]
     data = scraper(tech_info_path, info=False, filters=[["tech_","= {"],["tier ="],["prerequisites ="], dumb_techs], kill_filter=["member", "{}","{ }"], file_filter=["00"], output_name="object_list.txt", filter_mode="Multi")
 
     tree = dict_creator(data, dumb_techs)
@@ -292,17 +291,16 @@ def main(tech_info_path, tech_icon_path):
 
 
     mega_list = get_prerequisites(tree, "tech_mega_engineering")
-    ecu_list = get_prerequisites(tree, "tech_housing_2") + ["tech_housing_2"]
     if logging:
-        print("Mega list", mega_list)
-        print("Ecu list", ecu_list)
+        print(mega_list)
 
-    make_batch_file(structure, tech_icon_path, mega_list, ecu_list)
+    make_batch_file(structure, tech_icon_path, mega_list)
 
 
 if __name__ == '__main__':
-    global logging
+    global logging, line_logging
     logging = False
+    line_logging = False
     stellaris_game_path = r"C:\Program Files (x86)\Steam\steamapps\common\Stellaris"
 
     tech_info_path = stellaris_game_path + r"\common"
